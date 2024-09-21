@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>
+      {% block title %}Flavour Finder - A Restaurant Recommendation Website{%endblock %}
+    </title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    {% load static %}
+    <link href="{% static 'img/favicon.ico' %}" rel="icon" />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600&family=Nunito:wght@600;700;800&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Icon Font Stylesheet -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <style>
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
+
+      .toast {
+        background: #28a745; /* Green background for success */
+        color: white;
+        padding: 15px;
+        margin: 5px;
+        border-radius: 5px;
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+
+      .toast.show {
+        opacity: 1;
+      }
+    </style>
+    <div class="container-xxl bg-white p-0">
+      <div
+        id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center"
+      >
+        <div
+          class="spinner-border text-primary"
+          style="width: 3rem; height: 3rem"
+          role="status"
+        >
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+
+      <nav
+        class="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0"
+      >
+        <a href="{% url 'dashboard' %}" class="navbar-brand p-0">
+          <h1 class="text-primary m-0">
+            <i class="fa fa-utensils me-3"></i>Flavour Finder
+          </h1>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarCollapse"
+        >
+          <span class="fa fa-bars"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <div class="navbar-nav ms-auto py-0 pe-4">
+            <a href="{% url 'dashboard' %}" class="nav-item nav-link active"
+              >Home</a
+            >
+            <a href="{% url 'about' %}" class="nav-item nav-link">About</a>
+            <a href="{% url 'history' %}" class="nav-item nav-link">History</a>
+            <a href="{% url 'graph' %}" class="nav-item nav-link">Grah View</a>
+            <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+          </div>
+          <a href="{% url 'recommend' %}" class="btn btn-primary py-2 px-4"
+            >Get Recommendations</a
+          >
+          <br />
+          <form method="POST" action="{% url 'logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger py-2 px-4">
+              Logout
+            </button>
+          </form>
+        </div>
+      </nav>
+      <div class="container-xxl py-5 bg-dark hero-header mb-5"></div>
+      {% block content %}
+      <div class="container mt-5">
+        <div class="card">
+          <div class="card-header">
+            <h3>User Profile</h3>
+          </div>
+          <div class="card-body">
+            <form method="POST" id="profileForm">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label for="first_name" class="form-label">First Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="first_name"
+                  value="{{ user.first_name }}"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="last_name" class="form-label">Last Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="last_name"
+                  value="{{ user.last_name }}"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email:</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  value="{{ user.email }}"
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Update Profile
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#changePasswordModal"
+              >
+                Change Password
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password Modal -->
+      <div
+        class="modal fade"
+        id="changePasswordModal"
+        tabindex="-1"
+        aria-labelledby="changePasswordModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="changePasswordModalLabel">
+                Change Password
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <form method="POST" action="{% url 'change_password' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <label for="old_password" class="form-label"
+                    >Old Password:</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    name="old_password"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="new_password" class="form-label"
+                    >New Password:</label
+                  >
+                  <input
+                    type="password"
+                    class="form-control"
+                    name="new_password"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Change Password
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast Notification -->
+      {% if messages %}
+      <div id="toast-container">
+        {% for message in messages %}
+        <div
+          class="toast"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <script>
+        window.onload = function () {
+          const toasts = document.querySelectorAll(".toast");
+          toasts.forEach((toast) => {
+            toast.classList.add("show"); // Show the toast
+            setTimeout(() => {
+              toast.classList.remove("show"); // Hide the toast after 5 seconds
+            }, 5000);
+          });
+        };
+      </script>
+      {% endblock %}
+    </div>
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"
+      ><i class="bi bi-arrow-up"></i
+    ></a>
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/moment.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/moment-timezone.min.js' %}"></script>
+    <script src="{% static 'lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+  </body>
+</html>

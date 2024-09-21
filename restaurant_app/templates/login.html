@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+</head>
+<div id="toast-container" class="toast-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+
+<body>
+    <section class="forms-section">
+        
+        <h1 class="section-title">Login & Signup</h1>
+        <a href="/" class="btn-login" style="display: inline-block; text-align: center; padding: 10px 20px; background-color: #00d1b2; color: white; text-decoration: none; border-radius: 5px;">Back to Home</a>
+        <div class="forms">
+          <!-- Login Form -->
+          <div class="form-wrapper is-active">
+            <button type="button" class="switcher switcher-login">
+              Login
+              <span class="underline"></span>
+            </button>
+            
+            <form class="form form-login" method="POST" action="{% url 'login' %}">
+              {% csrf_token %}
+              <fieldset>
+                <legend>Please, enter your email and password for login.</legend>
+                <div class="input-block">
+                  <label for="login-username">Username</label>
+                  <input id="login-username" type="text" name="username" required>
+                </div>
+                <div class="input-block">
+                  <label for="login-password">Password</label>
+                  <input id="login-password" type="password" name="password" required>
+                </div>
+              </fieldset>
+              <button type="submit" class="btn-login">Login</button>  
+              <br>
+              
+               
+            </form>
+          </div>
+          <!-- Signup Form -->
+         
+            <div class="form-wrapper">
+                <button type="button" class="switcher switcher-signup">
+                  Sign Up
+                  <span class="underline"></span>
+                </button>
+                <form class="form form-signup" method="POST" action="{% url 'register' %}">
+                  {% csrf_token %}
+                  <fieldset>
+                    <legend>Please, enter your first name, last name, username, email, and password for sign up.</legend>
+                    <div class="input-row">
+                        <div class="input-block">
+                            <label for="signup-firstname">First Name</label>
+                            <input id="signup-firstname" type="text" name="first_name" required>
+                        </div>
+                        <div class="input-block">
+                            <label for="signup-lastname">Last Name</label>
+                            <input id="signup-lastname" type="text" name="last_name" required>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-block">
+                            <label for="signup-username">Username</label>
+                            <input id="signup-username" type="text" name="username" required>
+                        </div>
+                        <div class="input-block">
+                            <label for="signup-email">E-mail</label>
+                            <input id="signup-email" type="email" name="email" required>
+                        </div>
+                    </div>
+                    <div class="input-row">
+                        <div class="input-block">
+                            <label for="signup-password">Password</label>
+                            <input id="signup-password" type="password" name="password" required>
+                        </div>
+                        <div class="input-block">
+                            <label for="signup-password-confirm">Confirm Password</label>
+                            <input id="signup-password-confirm" type="password" name="password_confirm" required>
+                        </div>
+                    </div>
+                  </fieldset>
+                  <button type="submit" class="btn-signup">Sign Up</button>
+                </form>
+            </div>
+            
+       
+        
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      <script src="{% static 'js/login.js' %}"></script>
+      <script>
+        $(document).ready(function () {
+
+            // Toggle between login and signup views
+            $(".switcher-login, .switcher-signup").click(function () {
+                $(".form-wrapper").toggleClass("is-active");
+                $(".switcher-login, .switcher-signup").toggleClass("is-active");
+            });
+
+            // Shake effect when fields are empty
+            $(".btn-login, .btn-signup").hover(function () {
+                var usernameField = $(this).closest("form").find("input[type=text]");
+                var passwordField = $(this).closest("form").find("input[type=password]");
+                
+                if (usernameField.val() === "") {
+                    usernameField.animate({ "left": "-10px" }, 50)
+                        .animate({ "left": "10px" }, 50)
+                        .animate({ "left": "-5px" }, 50)
+                        .animate({ "left": "5px" }, 50)
+                        .animate({ "left": "0" }, 50);
+                }
+                if (passwordField.val() === "") {
+                    passwordField.animate({ "left": "10px" }, 50)
+                        .animate({ "left": "-10px" }, 50)
+                        .animate({ "left": "5px" }, 50)
+                        .animate({ "left": "-5px" }, 50)
+                        .animate({ "left": "0" }, 50);
+                }
+            });
+
+            // Initial animation on page load
+            setTimeout(function () {
+                $(".loginOrSignupField").css({
+                    "opacity": "1",
+                    "transform": "translateY(-50%) translateX(-50%) scale(1.008)"
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>

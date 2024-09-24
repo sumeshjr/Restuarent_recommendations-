@@ -16,10 +16,8 @@
     {% endif %}
 </div>
 
-
 <body>
     <section class="forms-section">
-        
         <h1 class="section-title">Login & Signup</h1>
         <a href="/" class="btn-login" style="display: inline-block; text-align: center; padding: 10px 20px; background-color: #00d1b2; color: white; text-decoration: none; border-radius: 5px;">Back to Home</a>
         <div class="forms">
@@ -30,7 +28,7 @@
               <span class="underline"></span>
             </button>
             
-            <form class="form form-login" method="POST" action="{% url 'login' %}">
+            <form class="form form-login" method="POST" action="{% url 'login' %}" onsubmit="return validateLogin();">
               {% csrf_token %}
               <fieldset>
                 <legend>Please, enter your email and password for login.</legend>
@@ -40,77 +38,71 @@
                 </div>
                 <div class="input-block">
                   <label for="login-password">Password</label>
-                  <input id="login-password" type="password" name="password" required>
+                  <input id="login-password" type="password" name="password" >
                 </div>
               </fieldset>
               <button type="submit" class="btn-login">Login</button>  
-              <br>
-              
-               
             </form>
           </div>
+
           <!-- Signup Form -->
-         
-            <div class="form-wrapper">
-                <button type="button" class="switcher switcher-signup">
-                  Sign Up
-                  <span class="underline"></span>
-                </button>
-                <form class="form form-signup" method="POST" action="{% url 'register' %}">
-                  {% csrf_token %}
-                  <fieldset>
-                    <legend>Please, enter your first name, last name, username, email, and password for sign up.</legend>
-                    <div class="input-row">
-                        <div class="input-block">
-                            <label for="signup-firstname">First Name</label>
-                            <input id="signup-firstname" type="text" name="first_name" required>
-                        </div>
-                        <div class="input-block">
-                            <label for="signup-lastname">Last Name</label>
-                            <input id="signup-lastname" type="text" name="last_name" required>
-                        </div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-block">
-                            <label for="signup-username">Username</label>
-                            <input id="signup-username" type="text" name="username" required>
-                        </div>
-                        <div class="input-block">
-                            <label for="signup-email">E-mail</label>
-                            <input id="signup-email" type="email" name="email" required>
-                        </div>
-                    </div>
-                    <div class="input-row">
-                        <div class="input-block">
-                            <label for="signup-password">Password</label>
-                            <input id="signup-password" type="password" name="password" required>
-                        </div>
-                        <div class="input-block">
-                            <label for="signup-password-confirm">Confirm Password</label>
-                            <input id="signup-password-confirm" type="password" name="password_confirm" required>
-                        </div>
-                    </div>
-                  </fieldset>
-                  <button type="submit" class="btn-signup">Sign Up</button>
-                </form>
-            </div>
-            
-       
-        
-      
+          <div class="form-wrapper">
+              <button type="button" class="switcher switcher-signup">
+                Sign Up
+                <span class="underline"></span>
+              </button>
+              <form class="form form-signup" method="POST" action="{% url 'register' %}" onsubmit="return validateSignup();">
+                {% csrf_token %}
+                <fieldset>
+                  <legend>Please, enter your first name, last name, username, email, and password for sign up.</legend>
+                  <div class="input-row">
+                      <div class="input-block">
+                          <label for="signup-firstname">First Name</label>
+                          <input id="signup-firstname" type="text" name="first_name" required>
+                      </div>
+                      <div class="input-block">
+                          <label for="signup-lastname">Last Name</label>
+                          <input id="signup-lastname" type="text" name="last_name" required>
+                      </div>
+                  </div>
+                  <div class="input-row">
+                      <div class="input-block">
+                          <label for="signup-username">Username</label>
+                          <input id="signup-username" type="text" name="username" required pattern="^[a-zA-Z0-9_]{3,15}$" title="Username must be 3-15 characters long and can include letters, numbers, and underscores.">
+                      </div>
+                      <div class="input-block">
+                          <label for="signup-email">E-mail</label>
+                          <input id="signup-email" type="email" name="email" required>
+                      </div>
+                  </div>
+                  <div class="input-row">
+                      <div class="input-block">
+                          <label for="signup-password">Password</label>
+                          <input id="signup-password" type="password" name="password" required minlength="6">
+                      </div>
+                      <div class="input-block">
+                          <label for="signup-password-confirm">Confirm Password</label>
+                          <input id="signup-password-confirm" type="password" name="password_confirm" required minlength="6">
+                      </div>
+                  </div>
+                </fieldset>
+                <button type="submit" class="btn-signup">Sign Up</button>
+              </form>
+          </div>
+        </div>
+
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
       <script src="{% static 'js/login.js' %}"></script>
       <script>
         $(document).ready(function () {
-
             // Toggle between login and signup views
-            $(".switcher-login, .switcher-signup").click(function () {
+            $(" .switcher-signup").click(function () {
                 $(".form-wrapper").toggleClass("is-active");
                 $(".switcher-login, .switcher-signup").toggleClass("is-active");
             });
 
             // Shake effect when fields are empty
-            $(".btn-login, .btn-signup").hover(function () {
+            $(" .btn-signup").hover(function () {
                 var usernameField = $(this).closest("form").find("input[type=text]");
                 var passwordField = $(this).closest("form").find("input[type=password]");
                 
@@ -138,6 +130,29 @@
                 });
             }, 500);
         });
-    </script>
+
+        // JavaScript Validation Functions
+        function validateLogin() {
+            var username = document.getElementById("login-username").value;
+            var password = document.getElementById("login-password").value;
+
+            if (username.trim() === "" || password.trim() === "") {
+                alert("Username and password cannot be empty.");
+                return false;
+            }
+            return true;
+        }
+
+        function validateSignup() {
+            var password = document.getElementById("signup-password").value;
+            var confirmPassword = document.getElementById("signup-password-confirm").value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return false;
+            }
+            return true;
+        }
+      </script>
 </body>
 </html>

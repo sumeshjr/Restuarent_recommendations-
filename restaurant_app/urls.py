@@ -28,4 +28,5 @@ urlpatterns = [
     path('profile/', user_profile, name='user_profile'),
     path('change-password/', change_password, name='change_password'),
     path('all_contacts/', all_contacts, name='all_contacts'),
+    path('chat_home/', chat_home, name='chat_home'),
 ]

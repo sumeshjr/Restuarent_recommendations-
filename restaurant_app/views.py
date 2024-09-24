@@ -476,3 +476,49 @@ def all_contacts(request):
     contacts = Contact.objects.all()  # Get all contact entries
     return render(request, 'all_contacts.html', {'contacts': contacts})
 #...........................End.......................................
+
+#...........................Chat.......................................
+
+import google.generativeai as genai
+
+# Configure your Google API key
+GOOGLE_API_KEY = 'AIzaSyAwDVSbu5KE3hw_x3jdg2DcUrfidfsaEuo'
+genai.configure(api_key=GOOGLE_API_KEY)
+
+# Initialize the Generative Model
+model = genai.GenerativeModel('gemini-pro')
+
+
+@login_required
+def chat_home(request):
+    # Fetch chat history for the logged-in user
+    chat_history = ChatHistory.objects.filter(user=request.user).order_by('created_at')
+
+    if request.method == 'POST':
+        user_input = request.POST.get('userInput').strip()
+
+        if user_input:
+            try:
+                # Generate response using Google Generative AI
+                response = model.generate_content(user_input)
+                bot_response = response.text
+
+                # Save user input and bot response to the database
+                ChatHistory.objects.create(
+                    user=request.user,
+                    message_input=user_input,
+                    bot_response=bot_response
+                )
+
+            except Exception as e:
+                messages.warning(request, f"An error occurred: {str(e)}")
+        
+        return redirect('chat_home')
+
+    context = {
+        'get_history': chat_history,
+        'messages': messages.get_messages(request)
+    }
+
+    return render(request, 'chat.html', context)
+#..................................End.........................................

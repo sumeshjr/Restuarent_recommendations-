@@ -222,6 +222,12 @@
         </div>
       </div>
 
+      <!-- Chat Button -->
+<a href="{% url 'chat_home' %}" class="btn btn-primary chat-btn" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+  Chat with Us
+</a>
+
+
       {% block content %}
       <!-- Display Messages -->
       {% if messages %}
